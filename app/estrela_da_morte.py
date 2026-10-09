@@ -1,3 +1,4 @@
+import ast
 import sqlite3
 import subprocess
 import requests
@@ -28,11 +29,14 @@ def holocron():
 @app.route("/forca")
 def forca():
     expressao = request.args.get("exp")
-    return str(eval(expressao))
+    try:
+        return str(ast.literal_eval(expressao))
+    except (ValueError, SyntaxError):
+        return "expressão inválida", 400
 
 @app.route("/aliados")
 def aliados():
-    r = requests.get("https://aliados.rebeldes.org/lista", verify=False)
+    r = requests.get("https://aliados.rebeldes.org/lista", timeout=10)
     return r.text
 
 if __name__ == "__main__":
